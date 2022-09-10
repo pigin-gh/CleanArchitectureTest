@@ -7,13 +7,21 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.piginp.cleanarchitecturetest.R
 import com.piginp.data.repository.UserRepositoryImpl
+import com.piginp.data.storage.sharedprefs.SharedPrefUserStorage
 import com.piginp.domain.models.SaveUserNameParam
+import com.piginp.domain.models.UserName
 import com.piginp.domain.usecase.GetUserNameUseCase
 import com.piginp.domain.usecase.SaveUserNameUseCase
 
 class MainActivity : AppCompatActivity() {
 
-    private val userRepository by lazy(LazyThreadSafetyMode.NONE) { UserRepositoryImpl(context = applicationContext) }
+    private val userRepository by lazy(LazyThreadSafetyMode.NONE) {
+        UserRepositoryImpl(
+            userStorage = SharedPrefUserStorage(
+                context = applicationContext
+            )
+        )
+    }
 
     private val getUserNameUseCase by lazy(LazyThreadSafetyMode.NONE) {
         GetUserNameUseCase(
@@ -47,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         getDataBt.setOnClickListener {
-            val userName = getUserNameUseCase.execute()
+            val userName: UserName = getUserNameUseCase.execute()
             dataTv.text = "${userName.firstname} ${userName.lastname}"
         }
 
